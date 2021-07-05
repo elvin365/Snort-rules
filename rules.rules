@@ -1,0 +1,100 @@
+ipvar M_IP 192.168.0.1
+
+ipvar F1_IP 192.168.10.1
+
+ipvar F2_IP 192.168.20.1
+
+ipvar M_TRUSTED_NET 192.168.1.0/25
+
+ipvar M_REGULAR_NET 192.168.2.0/24
+
+ipvar F1_TRUSTED_NET 192.168.11.0/30
+
+ipvar F1_REGULAR_NET 192.168.12.0/28
+
+ipvar F2_REGULAR_NET 192.168.22.0/25
+
+ipvar OTHER_NET ![$M_TRUSTED_NET,$M_REGULAR_NET,$F1_TRUSTED_NET,$F1_REGULAR_NET,$F2_REGULAR_NET]
+
+############################################################################################################################################
+
+portvar M_HTTP_PORT 80
+
+portvar F1_HTTP_PORT 80
+
+portvar F2_HTTP_PORT 8080
+
+#######################################
+# 1) M TRUSTED ->:
+
+
+alert tcp $M_TRUSTED_NET any -> $F1_IP $F1_HTTP_PORT (content:"/internal/"; http_uri; depth:10; sid:1000001; rev:1; msg:"M TRUSTED -> F1/internal/*";)
+
+alert tcp $M_TRUSTED_NET any -> $F2_IP $F2_HTTP_PORT (content:"/internal/"; http_uri; depth:10; sid:1000002; rev:1; msg:"M TRUSTED -> F2/internal/*";)
+
+############################################################################################################################################
+
+# 2) M REGULAR ->:
+alert tcp $M_REGULAR_NET any -> $M_IP $M_HTTP_PORT (content:"/confidential/"; http_uri; depth:14; sid:1000003; rev:1; msg:"M REGULAR -> M/confidential/*";)
+
+alert tcp $M_REGULAR_NET any -> $F1_IP $F1_HTTP_PORT (content:"/confidential/"; http_uri; depth:14; sid:1000004; rev:1; msg:"M REGULAR -> F1/confidential/*";)
+
+alert tcp $M_REGULAR_NET any -> $F1_IP $F1_HTTP_PORT (content:"/internal/"; http_uri; depth:10; sid:1000005; rev:1; msg:"M REGULAR -> F1/internal/*";)
+
+
+############################################################################################################################################
+
+# 3) F1 TRUSTED ->:
+
+alert tcp $F1_TRUSTED_NET any -> $M_IP $M_HTTP_PORT (content:"/internal/"; http_uri; depth:10; sid:1000006; rev:1; msg:"F1 TRUSTED -> M/internal/*";)
+
+alert tcp $F1_TRUSTED_NET any -> $F2_IP $F2_HTTP_PORT (content:"/internal/"; http_uri; depth:10; sid:1000007; rev:1; msg:"F1 TRUSTED -> F2/internal/*";)
+
+############################################################################################################################################
+
+# 4) F1 REGULAR ->:
+
+alert tcp $F1_REGULAR_NET any -> $M_IP $M_HTTP_PORT (content:"/confidential/"; http_uri; depth:14; sid:1000008; rev:1; msg:"F1 REGULAR -> M/confidential/*";)
+
+alert tcp $F1_REGULAR_NET any -> $M_IP $M_HTTP_PORT (content:"/internal/"; http_uri; depth:10; sid:1000009; rev:1; msg:"F1 REGULAR -> M/internal/*";)
+
+alert tcp $F1_REGULAR_NET any -> $F1_IP $F1_HTTP_PORT (content:"/confidential/"; http_uri; depth:14; sid:1000010; rev:1; msg:"F1 REGULAR -> F1/confidential/*";)
+
+alert tcp $F1_REGULAR_NET any -> $F2_IP $F2_HTTP_PORT (content:"/internal/"; http_uri; depth:10; sid:1000011; rev:1; msg:"F1 REGULAR -> F2/internal/*";)
+
+############################################################################################################################################
+
+
+# 5) F2 REGULAR ->:
+
+alert tcp $F2_REGULAR_NET any -> $M_IP $M_HTTP_PORT (content:"/confidential/"; http_uri; depth:14; sid:1000012; rev:1; msg:"F2 REGULAR -> M/confidential/*";)
+
+alert tcp $F2_REGULAR_NET any -> $M_IP $M_HTTP_PORT (content:"/internal/"; http_uri; depth:10; sid:1000013; rev:1; msg:"F2 REGULAR -> M/internal/*";)
+
+alert tcp $F2_REGULAR_NET any -> $F1_IP $F1_HTTP_PORT (content:"/confidential/"; http_uri; depth:14; sid:1000014; rev:1; msg:"F2 REGULAR -> F1/confidential/*";)
+
+alert tcp $F2_REGULAR_NET any -> $F1_IP $F1_HTTP_PORT (content:"/internal/"; http_uri; depth:10; sid:1000015; rev:1; msg:"F2 REGULAR -> F1/internal/*";)
+
+############################################################################################################################################
+
+
+# 6) OTHER ->:
+
+alert tcp $OTHER_NET any -> $M_IP $M_HTTP_PORT (content:"/confidential/"; http_uri; depth:14; sid:1000016; rev:1; msg:"OTHER -> M/confidential/*";)
+
+alert tcp $OTHER_NET any -> $M_IP $M_HTTP_PORT (content:"/internal/"; http_uri; depth:10; sid:1000017; rev:1; msg:"OTHER -> M/internal/*";)
+
+alert tcp $OTHER_NET any -> $F1_IP $F1_HTTP_PORT (content:"/confidential/"; http_uri; depth:14; sid:1000018; rev:1; msg:"OTHER -> F1/confidential/*";)
+
+alert tcp $OTHER_NET any -> $F1_IP $F1_HTTP_PORT (content:"/internal/"; http_uri; depth:10; sid:1000019; rev:1; msg:"OTHER -> F1/internal/*";)
+
+alert tcp $OTHER_NET any -> $F2_IP $F2_HTTP_PORT (content:"/internal/"; http_uri; depth:10; sid:1000020; rev:1; msg:"OTHER -> F2/internal/*";)
+
+
+
+
+
+
+
+
+
